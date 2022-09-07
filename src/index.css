@@ -1,0 +1,25 @@
+* {
+	margin: 0;
+	padding: 0;
+	box-sizing: border-box;
+}
+
+.btn {
+	color: #164f30;
+	margin-top: 20px;
+}
+
+.download-data-div {
+	width: 100%;
+	display: flex;
+	justify-content: center;
+	margin-top: 30px;
+}
+
+tr,
+th,
+td {
+	padding: 0.25rem 1rem;
+	border: 1px solid rgb(190, 190, 190);
+	text-align: center;
+}
