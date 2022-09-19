@@ -4,75 +4,10 @@ import axios from 'axios';
 import jsPDF from 'jspdf';
 import 'jspdf-autotable';
 
-function App() {
-	// data state
-	const [data, setData] = useState([]);
+// var img = new Image();
+// img.src = 'https://images.pexels.com/photos/20787/pexels-photo.jpg?auto=compress&cs=tinysrgb&h=350';
 
-	// click on fetch api button
-	const fetchApi = () => {
-		axios.get('https://jsonplaceholder.typicode.com/todos').then((response) => {
-			const data = response.data;
-			setData(data);
-		});
-	};
-
-	// download data in pdf format
-	const downloadData = async () => {
-		const input = document.getElementById('image');
-		const pdf = new jsPDF({
-			orientation: 'portrait',
-			// unit: 'mm',
-			// format: [210, 207],
-			format: 'a4',
-		});
-
-		var x = 0;
-
-		console.log(parseInt(document.getElementById('image').clientTop));
-		let a = pdf.text('Hello world!', 10, (x += 20));
-		console.log(a.getVerticalCoordinateString);
-		var img = new Image();
-		img.src = 'https://images.pexels.com/photos/20787/pexels-photo.jpg?auto=compress&cs=tinysrgb&h=350';
-		pdf.setFontSize(9);
-		console.log(x);
-		let reportTitle = `
-    Hello worldHello worldHello worldHello worldHello asdia sdipasidj aisdjioasd iosdjaosdi asdoiasjdasdoijasd  worldHello worldHello worldHello worldHello world! Finnn`;
-
-		reportTitle = pdf.splitTextToSize(reportTitle, 180);
-		pdf.text(reportTitle, 10, x + 10);
-		x += reportTitle.length * 9;
-		console.log(x);
-
-		//img puede ser un compinente tambien
-		pdf.addImage(img, 'jpg', 10, x, 70, 50).getVerticalCoordinateString();
-		x += 50;
-		x += 10;
-
-		//se le puede pasar el componente asi no se tiene que mostrar
-		//La tabla se corta automaticamente al pasarse de pagina
-		pdf.autoTable({
-			html: '#table',
-			startY: x,
-			tableLineColor: 'black',
-			tableLineWidth: 0.1,
-			theme: 'plain',
-			// alternateRowStyles: { lineWidth: 0.1, tableLineWidth: 0.1, lineColor: 'black' }, //Para filas alternadas
-			rowStyles: { lineWidth: 0.1, tableLineWidth: 0.1, lineColor: 'black' },
-
-			didParseCell: function (data) {
-				// var rows = data.table.body;
-				//Aca se pueden poner estilo a celdas individuales
-				data.cell.styles.lineWidth = 0.1;
-				data.cell.styles.lineColor = 'black';
-
-				// }
-			},
-			//Para saber hasta donde quedo la tabla en el pdf
-			didDrawPage: (d) => (x = d.cursor.y),
-		});
-
-		pdf.text('Hello world!', 10, x + 10);
-		reportTitle = `
+const reportTitle = `
     Hello worldHello worldHello worldHello worldHello asdia sdipasidj aisdjioasd iosdjaosdi asdoiasjdasdoijasd  worldHello worldHello worldHello worldHello world! Finnn
     Hello worldHello worldHello worldHello worldHello asdia sdipasidj aisdjioasd iosdjaosdi asdoiasjdasdoijasd  worldHello worldHello worldHello worldHello world! Finnn
     Hello worldHello worldHello worldHello worldHello asdia sdipasidj aisdjioasd iosdjaosdi asdoiasjdasdoijasd  worldHello worldHello worldHello worldHello world! Finnn
@@ -90,10 +25,93 @@ function App() {
     Hello worldHello worldHello worldHello worldHello asdia sdipasidj aisdjioasd iosdjaosdi asdoiasjdasdoijasd  worldHello worldHello worldHello worldHello world! Finnn
     `;
 
-		reportTitle += reportTitle;
+function App() {
+	// data state
+	const [data, setData] = useState([]);
+
+	// click on fetch api button
+	const fetchApi = () => {
+		axios.get('https://jsonplaceholder.typicode.com/todos').then((response) => {
+			const data = response.data;
+			setData(data.slice(0, 70));
+		});
+	};
+
+	// download data in pdf format
+	const downloadData = async () => {
+		const pdf = new jsPDF({
+			orientation: 'portrait',
+			// unit: 'mm',
+			// format: [210, 207],
+			format: 'a4',
+			// verticalOffset: 40,
+		});
+
+		var img = new Image();
+		img.src = 'https://images.pexels.com/photos/20787/pexels-photo.jpg?auto=compress&cs=tinysrgb&h=350';
+
+		pdf.html(document.getElementById('coso'), { x: 100, y: 200, html2canvas: { scale: pdf.internal.pageSize.width - 100 * 2 } });
+		var x = 20;
+
+		//Titulo
+		pdf.text('Hello world!', 10, (x += 20));
+
+		pdf.setFontSize(9);
+
+		let reportTitle = `
+    Hello worldHello worldHello worldHello worldHello asdia sdipasidj aisdjioasd iosdjaosdi asdoiasjdasdoijasd  worldHello worldHello worldHello worldHello world! Finnn`;
 
 		reportTitle = pdf.splitTextToSize(reportTitle, 180);
-		pdf.text(reportTitle, 10, x + 10);
+		pdf.text(reportTitle, 20, x + 10);
+		x += reportTitle.length * 9;
+
+		//se le puede pasar el componente asi no se tiene que mostrar
+		//La tabla se corta automaticamente al pasarse de pagina
+		pdf.autoTable({
+			html: '#table',
+			startY: x,
+			tableLineColor: 'black',
+			tableLineWidth: 0.1,
+			margin: { top: 40 },
+			theme: 'plain',
+			// alternateRowStyles: { lineWidth: 0.1, tableLineWidth: 0.1, lineColor: 'black' }, //Para filas alternadas
+			rowStyles: { lineWidth: 0.1, tableLineWidth: 0.1, lineColor: 'black' },
+
+			didParseCell: function (data) {
+				// var rows = data.table.body;
+				//Aca se pueden poner estilo a celdas individuales
+				data.cell.styles.lineWidth = 0.1;
+				data.cell.styles.lineColor = 'black';
+
+				// }
+			},
+			//Para saber hasta donde quedo la tabla en el pdf
+			didDrawPage: (d) => {
+				x = d.cursor.y;
+				// Header
+				pdf.setFontSize(20);
+				// pdf.dpdfsetTextColor(40);
+				pdf.text('Institucion', 30, 20);
+				pdf.addImage(img, 'jpg', 120, 10, 50, 22);
+				// Footer
+				var str = 'Page ' + pdf.internal.getNumberOfPages();
+
+				pdf.setFontSize(10);
+
+				// jsPDF 1.4+ uses getWidth, <1.4 uses .width
+				var pageSize = pdf.internal.pageSize;
+				var pageHeight = pageSize.height ? pageSize.height : pageSize.getHeight();
+				pdf.text(str, 100, pageHeight - 10);
+			},
+		});
+
+		pdf.text('Hello world!', 10, x + 10);
+		let reportTitle2 = reportTitle;
+
+		// reportTitle += reportTitle;
+
+		reportTitle2 = pdf.splitTextToSize(reportTitle2, 180);
+		pdf.text(reportTitle2, 10, x + 10);
 
 		pdf.text('Hello world 2', 10, (x += 10));
 
@@ -107,23 +125,7 @@ function App() {
 			<button onClick={fetchApi} className="btn btn-success btn-md">
 				FETCH API
 			</button>
-			<div id="coso">{`
-    Hello worldHello worldHello worldHello worldHello asdia sdipasidj aisdjioasd iosdjaosdi asdoiasjdasdoijasd  worldHello worldHello worldHello worldHello world! Finnn
-    Hello worldHello worldHello worldHello worldHello asdia sdipasidj aisdjioasd iosdjaosdi asdoiasjdasdoijasd  worldHello worldHello worldHello worldHello world! Finnn
-    Hello worldHello worldHello worldHello worldHello asdia sdipasidj aisdjioasd iosdjaosdi asdoiasjdasdoijasd  worldHello worldHello worldHello worldHello world! Finnn
-    Hello worldHello worldHello worldHello worldHello asdia sdipasidj aisdjioasd iosdjaosdi asdoiasjdasdoijasd  worldHello worldHello worldHello worldHello world! Finnn
-    Hello worldHello worldHello worldHello worldHello asdia sdipasidj aisdjioasd iosdjaosdi asdoiasjdasdoijasd  worldHello worldHello worldHello worldHello world! Finnn
-     Hello worldHello worldHello worldHello worldHello asdia sdipasidj aisdjioasd iosdjaosdi asdoiasjdasdoijasd  worldHello worldHello worldHello worldHello world! Finnn
-    Hello worldHello worldHello worldHello worldHello asdia sdipasidj aisdjioasd iosdjaosdi asdoiasjdasdoijasd  worldHello worldHello worldHello worldHello world! Finnn
-    Hello worldHello worldHello worldHello worldHello asdia sdipasidj aisdjioasd iosdjaosdi asdoiasjdasdoijasd  worldHello worldHello worldHello worldHello world! Finnn
-    Hello worldHello worldHello worldHello worldHello asdia sdipasidj aisdjioasd iosdjaosdi asdoiasjdasdoijasd  worldHello worldHello worldHello worldHello world! Finnn
-    Hello worldHello worldHello worldHello worldHello asdia sdipasidj aisdjioasd iosdjaosdi asdoiasjdasdoijasd  worldHello worldHello worldHello worldHello world! Finnn
-     Hello worldHello worldHello worldHello worldHello asdia sdipasidj aisdjioasd iosdjaosdi asdoiasjdasdoijasd  worldHello worldHello worldHello worldHello world! Finnn
-    Hello worldHello worldHello worldHello worldHello asdia sdipasidj aisdjioasd iosdjaosdi asdoiasjdasdoijasd  worldHello worldHello worldHello worldHello world! Finnn
-    Hello worldHello worldHello worldHello worldHello asdia sdipasidj aisdjioasd iosdjaosdi asdoiasjdasdoijasd  worldHello worldHello worldHello worldHello world! Finnn
-    Hello worldHello worldHello worldHello worldHello asdia sdipasidj aisdjioasd iosdjaosdi asdoiasjdasdoijasd  worldHello worldHello worldHello worldHello world! Finnn
-    Hello worldHello worldHello worldHello worldHello asdia sdipasidj aisdjioasd iosdjaosdi asdoiasjdasdoijasd  worldHello worldHello worldHello worldHello world! Finnn
-    `}</div>
+			<div id="coso">{reportTitle}</div>
 			<div className="download-data-div">
 				<button className="btn btn-primary btn-md" onClick={downloadData}>
 					DOWNLOAD DATA
